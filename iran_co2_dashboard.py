@@ -55,7 +55,7 @@ st.markdown("""
     
     /* FIXED DOWNLOAD BUTTON (NOW GREEN) */
     .stDownloadButton > button {
-        background-color: #92D050!important; /* Changed to Green */
+        background-color: #8DD7AE!important; /* Changed to Green */
         color: white !important;
         border: none !important;
         border-radius: 4px !important;

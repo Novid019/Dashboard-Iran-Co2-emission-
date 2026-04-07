@@ -7,7 +7,7 @@ import numpy as np
 # --- 1. Page Configuration (Locked Sidebar Open) ---
 st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide", initial_sidebar_state="expanded")
 
-# --- 2. Custom UI (Shiny App Structure + Original Colors + LEFT SIDEBAR + AGGRESSIVE NO HIDE) ---
+# --- 2. Custom UI (Shiny App Structure + Original Colors + LEFT SIDEBAR + GREEN DOWNLOAD BUTTON) ---
 st.markdown("""
     <style>
     /* Force Main Background to a shade of Green */
@@ -53,9 +53,9 @@ st.markdown("""
         color: white !important;
     }
     
-    /* FIXED DOWNLOAD BUTTON */
+    /* FIXED DOWNLOAD BUTTON (NOW GREEN) */
     .stDownloadButton > button {
-        background-color: #b71c1c !important;
+        background-color: #1b5e20 !important; /* Changed to Green */
         color: white !important;
         border: none !important;
         border-radius: 4px !important;
@@ -64,7 +64,7 @@ st.markdown("""
         margin-top: 20px;
     }
     .stDownloadButton > button:hover {
-        background-color: #9a0007 !important;
+        background-color: #124116 !important; /* Darker green on hover */
         color: white !important;
     }
     

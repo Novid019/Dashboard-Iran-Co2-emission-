@@ -77,7 +77,7 @@ st.markdown("""
         border-color: #cccccc !important;
     }
 
-    /* HIDE KEYBOARD_DOUBLE TOOLTIP */
+    /* HIDE |||*/
     [data-testid="collapsedControl"] {
         pointer-events: none; /* Disable the glitchy hover completely */
     }

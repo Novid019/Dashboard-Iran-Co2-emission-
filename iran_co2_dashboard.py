@@ -7,7 +7,7 @@ import numpy as np
 # --- 1. Page Configuration (Locked Sidebar Open) ---
 st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide", initial_sidebar_state="expanded")
 
-# --- 2. Custom UI (Shiny App Structure + Original Colors + LEFT SIDEBAR + NO HIDE) ---
+# --- 2. Custom UI (Shiny App Structure + Original Colors + LEFT SIDEBAR + AGGRESSIVE NO HIDE) ---
 st.markdown("""
     <style>
     /* Force Main Background to a shade of Green */
@@ -103,9 +103,18 @@ st.markdown("""
         font-weight: 600;
     }
 
-    /* --- REMOVE SIDEBAR HIDE FUNCTION COMPLETELY --- */
+    /* --- AGGRESSIVELY REMOVE SIDEBAR HIDE FUNCTION --- */
+    /* Targets the 'closed' state button */
     [data-testid="collapsedControl"] { 
         display: none !important; 
+    }
+    /* Targets the 'open' state button inside the sidebar */
+    [data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+    }
+    /* Fallback for older/newer Streamlit versions */
+    section[data-testid="stSidebar"] button[kind="header"] {
+        display: none !important;
     }
     
     hr { border-color: #e5cacc !important; }
@@ -183,8 +192,6 @@ C_WORLD = "#424242"
 C_TREND = "#000000"  
 
 # --- TAB ROUTING ---
-# ALL charts are full width (stacked vertically).
-
 if menu == "📈 Emissions Trends":
     # Chart 1
     st.markdown(f'<div class="chart-container"><h3 style="color: #1b5e20;">📈 1. Total CO₂ Emissions Trend ({target_country})</h3>', unsafe_allow_html=True)
@@ -238,7 +245,6 @@ elif menu == "💰 Economic Growth":
                       color='Country', hover_name='Country', size='Population', size_max=60,
                       log_x=True, log_y=True, opacity=0.9, color_discrete_map={target_country: C_MAIN})
 
-    # Fixed Manual Tick Arrays applied directly to the plot axes to completely override Auto-Ticks
     fig4.update_layout(
         **layout_template,
         xaxis_title="GDP per Capita (Constant US$) - Log Scale",

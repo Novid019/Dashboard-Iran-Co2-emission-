@@ -66,7 +66,6 @@ st.markdown("""
         box-shadow: 0 6px 15px rgba(0,0,0,0.08) !important;
         margin-bottom: 40px !important; 
         border: 2px solid #1b5e20 !important;
-        height: 100%;
     }
 
     /* Force dropdown menus to stay readable */
@@ -161,50 +160,43 @@ C_COMP = "#1b5e20"
 C_WORLD = "#424242"  
 C_TREND = "#000000"  
 
-# ----------------- CHARTS 1 & 2 (SIDE BY SIDE) -----------------
-col1, col2 = st.columns(2)
+# --- Chart 1: Total CO2 Emissions ---
+st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+st.markdown(f"<h3 style='color: #1b5e20;'>📈 1. Total CO₂ Emissions Trend ({target_country})</h3>", unsafe_allow_html=True)
+fig1 = go.Figure()
+fig1.add_trace(go.Scatter(x=df_target['Year'], y=df_target['Total CO2 Emissions (Mt)'], mode='lines+markers', name=target_country, line=dict(color=C_MAIN, width=4), marker=dict(size=10)))
 
-with col1:
-    # --- Chart 1: Total CO2 Emissions ---
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    st.markdown(f"<h3 style='color: #1b5e20;'>📈 1. Total CO₂ Emissions Trend ({target_country})</h3>", unsafe_allow_html=True)
-    fig1 = go.Figure()
-    fig1.add_trace(go.Scatter(x=df_target['Year'], y=df_target['Total CO2 Emissions (Mt)'], mode='lines+markers', name=target_country, line=dict(color=C_MAIN, width=4), marker=dict(size=10)))
+if len(df_target) > 1:
+    z = np.polyfit(df_target['Year'], df_target['Total CO2 Emissions (Mt)'], 1)
+    p = np.poly1d(z)
+    fig1.add_trace(go.Scatter(x=df_target['Year'], y=p(df_target['Year']), mode='lines', name='Trend', line=dict(color=C_TREND, width=2, dash='dot')))
+    
+fig1.update_layout(**layout_template, yaxis_title="Total CO₂ (Mt)", xaxis_title="Year",
+                   xaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13), tickangle=0, nticks=15),
+                   yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13)))
+st.plotly_chart(fig1, use_container_width=True, config=config, theme=None)
+st.markdown(CITATION_HTML, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-    if len(df_target) > 1:
-        z = np.polyfit(df_target['Year'], df_target['Total CO2 Emissions (Mt)'], 1)
-        p = np.poly1d(z)
-        fig1.add_trace(go.Scatter(x=df_target['Year'], y=p(df_target['Year']), mode='lines', name='Trend', line=dict(color=C_TREND, width=2, dash='dot')))
-        
-    fig1.update_layout(**layout_template, yaxis_title="Total CO₂ (Mt)", xaxis_title="Year",
-                       xaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13), tickangle=0, nticks=15),
-                       yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13)))
-    st.plotly_chart(fig1, use_container_width=True, config=config, theme=None)
-    st.markdown(CITATION_HTML, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+# --- Chart 2: Per Capita ---
+st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+st.markdown("<h3 style='color: #1b5e20;'>👤 2. Per Capita Emissions vs Global Average</h3>", unsafe_allow_html=True)
+fig2 = go.Figure()
+fig2.add_trace(go.Scatter(x=df_target['Year'], y=df_target['Per Capita CO2 (Mt)'], mode='lines+markers', name=target_country, line=dict(color=C_COMP, width=4), marker=dict(size=10)))
+fig2.add_trace(go.Scatter(x=df_world['Year'], y=df_world['Per Capita CO2 (Mt)'], mode='lines', name='World Avg', line=dict(color=C_WORLD, width=3, dash='dash')))
 
-with col2:
-    # --- Chart 2: Per Capita ---
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    st.markdown("<h3 style='color: #1b5e20;'>👤 2. Per Capita Emissions vs Global Average</h3>", unsafe_allow_html=True)
-    fig2 = go.Figure()
-    fig2.add_trace(go.Scatter(x=df_target['Year'], y=df_target['Per Capita CO2 (Mt)'], mode='lines+markers', name=target_country, line=dict(color=C_COMP, width=4), marker=dict(size=10)))
-    fig2.add_trace(go.Scatter(x=df_world['Year'], y=df_world['Per Capita CO2 (Mt)'], mode='lines', name='World Avg', line=dict(color=C_WORLD, width=3, dash='dash')))
+if len(df_target) > 1:
+    z = np.polyfit(df_target['Year'], df_target['Per Capita CO2 (Mt)'], 1)
+    p = np.poly1d(z)
+    fig2.add_trace(go.Scatter(x=df_target['Year'], y=p(df_target['Year']), mode='lines', name='Trend', line=dict(color=C_TREND, width=2, dash='dot')))
 
-    if len(df_target) > 1:
-        z = np.polyfit(df_target['Year'], df_target['Per Capita CO2 (Mt)'], 1)
-        p = np.poly1d(z)
-        fig2.add_trace(go.Scatter(x=df_target['Year'], y=p(df_target['Year']), mode='lines', name='Trend', line=dict(color=C_TREND, width=2, dash='dot')))
+fig2.update_layout(**layout_template, yaxis_title="Per Capita CO₂ (t/person)", xaxis_title="Year",
+                   xaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13), tickangle=0, nticks=15),
+                   yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13)))
+st.plotly_chart(fig2, use_container_width=True, config=config, theme=None)
+st.markdown(CITATION_HTML, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-    fig2.update_layout(**layout_template, yaxis_title="Per Capita CO₂ (t/person)", xaxis_title="Year",
-                       xaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13), tickangle=0, nticks=15),
-                       yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13)))
-    st.plotly_chart(fig2, use_container_width=True, config=config, theme=None)
-    st.markdown(CITATION_HTML, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-# ----------------- CHARTS 3 & 4 (FULL WIDTH) -----------------
 # --- Chart 3: Peer Comparison ---
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 st.markdown(f"<h3 style='color: #1b5e20;'>⚖️ 3. Regional Peer Comparison ({selected_years[1]})</h3>", unsafe_allow_html=True)
@@ -221,7 +213,7 @@ st.plotly_chart(fig3, use_container_width=True, config=config, theme=None)
 st.markdown(CITATION_HTML, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- Chart 4: GDP vs Emissions Scatter (FIXED LOG AXIS) ---
+# --- Chart 4: GDP vs Emissions Scatter (FIXED LOG AXIS WITH DTICK) ---
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 st.markdown("<h3 style='color: #1b5e20;'>💰 4. Economic Growth vs Carbon Output</h3>", unsafe_allow_html=True)
 df_scatter = df_filtered[df_filtered['Country'].isin(compare_full_list)]
@@ -230,13 +222,14 @@ fig4 = px.scatter(df_scatter, x='GDP per Capita (Constant US$)', y='Total CO2 Em
                   color='Country', hover_name='Country', size='Population', size_max=60,
                   log_x=True, log_y=True, opacity=0.9, color_discrete_map={target_country: C_MAIN})
 
-# FIXED: Removed 'tickmode' and 'nticks' from both axes
+# FIXED: Added dtick=1 to force Plotly to ONLY draw labels at 10, 100, 1000...
 fig4.update_layout(
     **layout_template,
     xaxis_title="GDP per Capita (Constant US$) - Log Scale",
     yaxis_title="Total CO₂ Emissions (Mt) - Log Scale",
     xaxis=dict(
         type='log',
+        dtick=1, 
         showgrid=True, 
         gridcolor='#e0e0e0', 
         title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), 
@@ -244,6 +237,7 @@ fig4.update_layout(
     ),
     yaxis=dict(
         type='log',
+        dtick=1, 
         showgrid=True, 
         gridcolor='#e0e0e0', 
         title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), 
@@ -260,41 +254,33 @@ st.plotly_chart(fig4, use_container_width=True, config=config, theme=None)
 st.markdown(CITATION_HTML, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
+# --- Chart 5: Global Share Pie ---
+st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+st.markdown(f"<h3 style='color: #1b5e20;'>🌐 5. Global Share of Emissions ({selected_years[1]})</h3>", unsafe_allow_html=True)
+target_share = latest_data['Share of Global CO2 (%)'] if 'Share of Global CO2 (%)' in latest_data else 0
+pie_data = pd.DataFrame({'Category': [target_country, 'Rest of the World'], 'Share (%)': [target_share, max(0, 100 - target_share)]})
 
-# ----------------- CHARTS 5 & 6 (SIDE BY SIDE) -----------------
-col3, col4 = st.columns(2)
+fig6 = px.pie(pie_data, names='Category', values='Share (%)', hole=0.5, color='Category', color_discrete_map={target_country: C_MAIN, 'Rest of the World': '#a5d6a7'})
+fig6.update_layout(height=550, paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)', margin=dict(l=40, r=40, t=60, b=40), font=dict(color='#1a1a1a', size=16))
+fig6.update_traces(textposition='inside', textinfo='percent+label', marker=dict(line=dict(color='#ffffff', width=2)))
+st.plotly_chart(fig6, use_container_width=True, config=config, theme=None)
+st.markdown(CITATION_HTML, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-with col3:
-    # --- Chart 5: Global Share Pie ---
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    st.markdown(f"<h3 style='color: #1b5e20;'>🌐 5. Global Share of Emissions ({selected_years[1]})</h3>", unsafe_allow_html=True)
-    target_share = latest_data['Share of Global CO2 (%)'] if 'Share of Global CO2 (%)' in latest_data else 0
-    pie_data = pd.DataFrame({'Category': [target_country, 'Rest of the World'], 'Share (%)': [target_share, max(0, 100 - target_share)]})
-    
-    # Changed 'Rest of the World' color to Light Green (#a5d6a7)
-    fig6 = px.pie(pie_data, names='Category', values='Share (%)', hole=0.5, color='Category', color_discrete_map={target_country: C_MAIN, 'Rest of the World': '#a5d6a7'})
-    fig6.update_layout(height=550, paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)', margin=dict(l=40, r=40, t=60, b=40), font=dict(color='#1a1a1a', size=16))
-    fig6.update_traces(textposition='inside', textinfo='percent+label', marker=dict(line=dict(color='#ffffff', width=2)))
-    st.plotly_chart(fig6, use_container_width=True, config=config, theme=None)
-    st.markdown(CITATION_HTML, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+# --- Chart 6: Stacked Bar ---
+st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+st.markdown(f"<h3 style='color: #1b5e20;'>🏭 6. Sector Breakdown: Sources of Emissions ({target_country})</h3>", unsafe_allow_html=True)
+sources = ['Coal CO2 (Mt)', 'Oil CO2 (Mt)', 'Gas CO2 (Mt)', 'Cement CO2 (Mt)', 'Flaring CO2 (Mt)']
+source_colors = ['#1b5e20', '#b71c1c', '#0d47a1', '#e65100', '#4a148c'] 
 
-with col4:
-    # --- Chart 6: Stacked Bar ---
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    st.markdown(f"<h3 style='color: #1b5e20;'>🏭 6. Sector Breakdown: Sources of Emissions ({target_country})</h3>", unsafe_allow_html=True)
-    sources = ['Coal CO2 (Mt)', 'Oil CO2 (Mt)', 'Gas CO2 (Mt)', 'Cement CO2 (Mt)', 'Flaring CO2 (Mt)']
-    source_colors = ['#1b5e20', '#b71c1c', '#0d47a1', '#e65100', '#4a148c'] 
-
-    df_sources = df_target[['Year'] + sources].melt(id_vars='Year', var_name='Source', value_name='Emissions')
-    fig5 = px.bar(df_sources, x='Year', y='Emissions', color='Source', color_discrete_sequence=source_colors)
-    fig5.update_layout(**layout_template, barmode='stack', yaxis_title="CO₂ Emissions (Mt)", xaxis_title="Year",
-                       xaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13), tickangle=0, nticks=15),
-                       yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13)))
-    st.plotly_chart(fig5, use_container_width=True, config=config, theme=None)
-    st.markdown(CITATION_HTML, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
+df_sources = df_target[['Year'] + sources].melt(id_vars='Year', var_name='Source', value_name='Emissions')
+fig5 = px.bar(df_sources, x='Year', y='Emissions', color='Source', color_discrete_sequence=source_colors)
+fig5.update_layout(**layout_template, barmode='stack', yaxis_title="CO₂ Emissions (Mt)", xaxis_title="Year",
+                   xaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13), tickangle=0, nticks=15),
+                   yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13)))
+st.plotly_chart(fig5, use_container_width=True, config=config, theme=None)
+st.markdown(CITATION_HTML, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # --- FIXED Download Button ---
 st.markdown("<div style='text-align: center; margin-top: 20px; margin-bottom: 50px;'>", unsafe_allow_html=True)

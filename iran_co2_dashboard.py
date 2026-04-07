@@ -4,8 +4,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-# --- 1. Page Configuration ---
-st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide")
+# --- 1. Page Configuration (Sidebar collapsed by default to show toggle icon) ---
+st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide", initial_sidebar_state="collapsed")
 
 # --- 2. Custom UI (Forced Light Mode, Green/Red Theme, Uniform Borders) ---
 st.markdown("""
@@ -77,7 +77,6 @@ df = load_data()
 # --- 4. Sidebar Controls ---
 st.sidebar.markdown("<h1 style='text-align: center; font-size: 40px;'>🌍</h1>", unsafe_allow_html=True)
 st.sidebar.markdown("<h3 style='text-align: center; color: #b71c1c !important; font-weight: 700;'>Climate Dashboard</h3>", unsafe_allow_html=True)
-st.sidebar.markdown("<p style='text-align: center; font-size: 13px; color: #424242 !important;'>BS Analytics & Sustainability<br>TISS Mumbai | M2024BSASS019</p>", unsafe_allow_html=True)
 st.sidebar.divider()
 
 st.sidebar.subheader("🎛️ Parameters")
@@ -99,9 +98,7 @@ latest_year_data = df_target[df_target['Year'] == df_target['Year'].max()]
 latest_data = latest_year_data.iloc[0] if not latest_year_data.empty else {'Total CO2 Emissions (Mt)': 0, 'Per Capita CO2 (Mt)': 0, 'Share of Global CO2 (%)': 0}
 
 # --- 5. Main Layout ---
-st.markdown(f"<h1 style='font-weight: 800; color: #1b5e20 !important; text-align: center;'>{target_country} CO₂ Emissions Analysis</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 16px; color: #424242;'>Investigating historical carbon footprints, economic growth, and climate responsibility.</p>", unsafe_allow_html=True)
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='font-weight: 800; color: #1b5e20 !important; text-align: center; margin-bottom: 30px;'>{target_country} CO₂ Emissions Analysis</h1>", unsafe_allow_html=True)
 
 # KPIs (Now with uniform borders!)
 kpi1, kpi2, kpi3 = st.columns(3)
@@ -120,7 +117,7 @@ config = {
     'toImageButtonOptions': {'format': 'png', 'filename': 'TISS_Chart', 'height': 700, 'width': 1200, 'scale': 2}
 }
 
-# FIXED: Proportions Logic (Full width, fixed height, ample margins)
+# Proportions Logic (Full width, fixed height, ample margins)
 layout_template = dict(
     height=550, 
     paper_bgcolor='rgba(255,255,255,1)',
@@ -131,7 +128,7 @@ layout_template = dict(
         showgrid=True, gridcolor='#e0e0e0', 
         title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), 
         tickfont=dict(color='#1a1a1a', size=13),
-        tickangle=0, # Straight text because charts are now full width!
+        tickangle=0, 
         nticks=15      
     ),
     yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), tickfont=dict(color='#1a1a1a', size=13))
@@ -186,7 +183,7 @@ fig3 = px.bar(df_latest_compare, x='Per Capita CO2 (Mt)', y='Country', orientati
 fig3.update_traces(marker_color=[C_MAIN if c == target_country else C_COMP for c in df_latest_compare['Country']], textposition="outside", textfont=dict(size=14, color="#1a1a1a"))
 
 layout_bar = layout_template.copy()
-layout_bar['margin'] = dict(l=150, r=40, t=60, b=80) # Extra left margin for country names
+layout_bar['margin'] = dict(l=150, r=40, t=60, b=80) 
 fig3.update_layout(**layout_bar, showlegend=False, xaxis_title="Per Capita CO₂ (t/person)", yaxis_title="")
 st.plotly_chart(fig3, use_container_width=True, config=config, theme=None)
 st.markdown(CITATION_HTML, unsafe_allow_html=True)
@@ -200,7 +197,18 @@ fig4 = px.scatter(df_scatter, x='GDP per Capita (Constant US$)', y='Total CO2 Em
                   color='Country', hover_name='Country', size='Population', size_max=60,
                   log_x=True, log_y=True, opacity=0.9)
 
-fig4.update_layout(**layout_template, xaxis_title="GDP per Capita (Constant US$ - Log Scale)", yaxis_title="Total CO₂ Emissions (Mt - Log Scale)")
+layout_scatter = layout_template.copy()
+layout_scatter['xaxis'] = dict(
+    showgrid=True, gridcolor='#e0e0e0', 
+    title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), 
+    tickfont=dict(color='#1a1a1a', size=13)
+)
+layout_scatter['yaxis'] = dict(
+    showgrid=True, gridcolor='#e0e0e0', 
+    title_font=dict(size=16, color='#1a1a1a', family="Segoe UI", weight="bold"), 
+    tickfont=dict(color='#1a1a1a', size=13)
+)
+fig4.update_layout(**layout_scatter, xaxis_title="GDP per Capita (Constant US$ - Log Scale)", yaxis_title="Total CO₂ Emissions (Mt - Log Scale)")
 st.plotly_chart(fig4, use_container_width=True, config=config, theme=None)
 st.markdown(CITATION_HTML, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)

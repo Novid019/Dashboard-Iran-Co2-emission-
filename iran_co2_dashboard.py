@@ -7,7 +7,7 @@ import numpy as np
 # --- 1. Page Configuration ---
 st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide")
 
-# --- 2. Custom UI (Forced Light Mode, Green/Red Theme) ---
+# --- 2. Custom UI (Forced Light Mode, Green/Red Theme, Fixed Borders & Spacing) ---
 st.markdown("""
     <style>
     /* Force Main Background to a shade of Green */
@@ -31,7 +31,7 @@ st.markdown("""
     div[data-testid="metric-container"] {
         background-color: #ffffff !important;
         padding: 20px !important;
-        border-radius: 15px !important;
+        border-radius: 20px !important; /* Rounded */
         box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
         border: 2px solid #b71c1c !important; /* Dark Red border */
         text-align: center;
@@ -43,14 +43,14 @@ st.markdown("""
         font-weight: 800 !important;
     }
     
-    /* Custom CSS for Chart Containers */
+    /* Custom CSS for Chart Containers (Fixed Border, Radius, and Spacing) */
     .chart-container {
         background-color: #ffffff !important;
-        padding: 20px !important;
-        border-radius: 15px !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-        margin-bottom: 25px !important;
-        border: 1px solid #dcdcdc !important;
+        padding: 25px !important;
+        border-radius: 20px !important; /* Round border */
+        box-shadow: 0 6px 15px rgba(0,0,0,0.08) !important;
+        margin-bottom: 35px !important; /* Equal distance between rows */
+        border: 2px solid #1b5e20 !important; /* Colored border (Dark Green) */
     }
 
     /* Force dropdown menus to stay readable in dark mode */
@@ -99,7 +99,7 @@ st.markdown(f"<h2 style='font-weight: 800; color: #1b5e20 !important;'>{target_c
 st.caption("Investigating historical carbon footprints, economic growth, and climate responsibility.")
 st.markdown("<br>", unsafe_allow_html=True)
 
-# MOVED KPIs to Main Layout
+# KPIs on Main Layout
 st.markdown(f"#### 📈 Overview ({selected_years[1]})")
 kpi1, kpi2, kpi3 = st.columns(3)
 with kpi1:
@@ -117,13 +117,20 @@ config = {
     'toImageButtonOptions': {'format': 'png', 'filename': 'TISS_Chart', 'height': 600, 'width': 1000, 'scale': 2}
 }
 
-# Clean Chart Layout Template (Forcing white background and dark text for charts)
+# FIXED: Clean Chart Layout Template (Uniform height, angled X-axis to prevent clutter)
 layout_template = dict(
+    height=450, # Uniform height for perfect proportions
     paper_bgcolor='rgba(255,255,255,1)',
     plot_bgcolor='rgba(255,255,255,1)',
     font=dict(color='#1a1a1a', family="Segoe UI"),
-    margin=dict(l=20, r=20, t=40, b=20),
-    xaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=14, color='#333333'), tickfont=dict(color='#1a1a1a')),
+    margin=dict(l=20, r=20, t=50, b=60), # Extra bottom margin for angled text
+    xaxis=dict(
+        showgrid=True, gridcolor='#e0e0e0', 
+        title_font=dict(size=14, color='#333333'), 
+        tickfont=dict(color='#1a1a1a', size=11),
+        tickangle=-45, # Tilts the text to prevent overlapping
+        nticks=10      # Prevents too many labels from squishing together
+    ),
     yaxis=dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=14, color='#333333'), tickfont=dict(color='#1a1a1a'))
 )
 
@@ -176,7 +183,10 @@ df_latest_compare = df[(df['Year'] == selected_years[1]) & (df['Country'].isin(c
 
 fig3 = px.bar(df_latest_compare, x='Per Capita CO2 (Mt)', y='Country', orientation='h', text_auto='.2f', color='Country', color_discrete_map={target_country: C_MAIN})
 fig3.update_traces(marker_color=[C_MAIN if c == target_country else C_COMP for c in df_latest_compare['Country']], textposition="outside")
-fig3.update_layout(**layout_template, showlegend=False, xaxis_title="Per Capita CO₂ (t/person)", yaxis_title="")
+# Use layout template but remove x-axis angle since this is a horizontal bar chart
+layout_bar = layout_template.copy()
+layout_bar['xaxis'] = dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=14, color='#333333'), tickfont=dict(color='#1a1a1a'))
+fig3.update_layout(**layout_bar, showlegend=False, xaxis_title="Per Capita CO₂ (t/person)", yaxis_title="")
 st.plotly_chart(fig3, use_container_width=True, config=config, theme=None)
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -190,7 +200,10 @@ with col3:
     fig4 = px.scatter(df_scatter, x='GDP per Capita (Constant US$)', y='Total CO2 Emissions (Mt)', 
                       color='Country', hover_name='Country', size='Population', size_max=45,
                       log_x=True, log_y=True, opacity=0.9)
-    fig4.update_layout(**layout_template)
+    # Remove angle for log-scaled X axis for cleaner look
+    layout_scatter = layout_template.copy()
+    layout_scatter['xaxis'] = dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=14, color='#333333'), tickfont=dict(color='#1a1a1a'))
+    fig4.update_layout(**layout_scatter)
     st.plotly_chart(fig4, use_container_width=True, config=config, theme=None)
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -201,7 +214,7 @@ with col4:
     target_share = latest_data['Share of Global CO2 (%)'] if 'Share of Global CO2 (%)' in latest_data else 0
     pie_data = pd.DataFrame({'Category': [target_country, 'Rest of the World'], 'Share (%)': [target_share, max(0, 100 - target_share)]})
     fig6 = px.pie(pie_data, names='Category', values='Share (%)', hole=0.5, color='Category', color_discrete_map={target_country: C_MAIN, 'Rest of the World': '#9e9e9e'})
-    fig6.update_layout(paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)', margin=dict(l=20, r=20, t=40, b=20), font=dict(color='#1a1a1a'))
+    fig6.update_layout(height=450, paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)', margin=dict(l=20, r=20, t=40, b=20), font=dict(color='#1a1a1a'))
     fig6.update_traces(textposition='inside', textinfo='percent+label')
     st.plotly_chart(fig6, use_container_width=True, config=config, theme=None)
     st.markdown('</div>', unsafe_allow_html=True)

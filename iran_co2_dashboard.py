@@ -43,7 +43,7 @@ st.markdown("""
         font-weight: 800 !important;
     }
     
-    /* Custom CSS for Chart Containers (Fixed Border, Radius, and Spacing) */
+    /* Custom CSS for Chart Containers (Larger background, fixed borders) */
     .chart-container {
         background-color: #ffffff !important;
         padding: 25px !important;
@@ -62,6 +62,9 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
+# Shared Citation HTML for all charts
+CITATION_HTML = "<p style='font-size: 11px; color: #424242; text-align: right; margin-top: -5px; margin-bottom: 0px; font-style: italic;'>Data: Our World in Data (OWID)</p>"
 
 # --- 3. Data Loading ---
 @st.cache_data
@@ -117,13 +120,13 @@ config = {
     'toImageButtonOptions': {'format': 'png', 'filename': 'TISS_Chart', 'height': 600, 'width': 1000, 'scale': 2}
 }
 
-# FIXED: Clean Chart Layout Template (Uniform height, angled X-axis to prevent clutter)
+# FIXED: Clean Chart Layout Template (Larger height, extra bottom margin for labels)
 layout_template = dict(
-    height=450, # Uniform height for perfect proportions
+    height=550, # INCREASED height for larger background proportions
     paper_bgcolor='rgba(255,255,255,1)',
     plot_bgcolor='rgba(255,255,255,1)',
     font=dict(color='#1a1a1a', family="Segoe UI"),
-    margin=dict(l=20, r=20, t=50, b=60), # Extra bottom margin for angled text
+    margin=dict(l=20, r=20, t=50, b=70), # Increased bottom margin (b=70) so labels aren't squished
     xaxis=dict(
         showgrid=True, gridcolor='#e0e0e0', 
         title_font=dict(size=14, color='#333333'), 
@@ -156,6 +159,7 @@ with col1:
         
     fig1.update_layout(**layout_template, yaxis_title="Total CO₂ (Mt)")
     st.plotly_chart(fig1, use_container_width=True, config=config, theme=None)
+    st.markdown(CITATION_HTML, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Chart 2: Per Capita CO2 Emissions ---
@@ -173,6 +177,7 @@ with col2:
 
     fig2.update_layout(**layout_template, yaxis_title="Per Capita CO₂ (t/person)")
     st.plotly_chart(fig2, use_container_width=True, config=config, theme=None)
+    st.markdown(CITATION_HTML, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Chart 3: Peer Comparison ---
@@ -188,6 +193,7 @@ layout_bar = layout_template.copy()
 layout_bar['xaxis'] = dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=14, color='#333333'), tickfont=dict(color='#1a1a1a'))
 fig3.update_layout(**layout_bar, showlegend=False, xaxis_title="Per Capita CO₂ (t/person)", yaxis_title="")
 st.plotly_chart(fig3, use_container_width=True, config=config, theme=None)
+st.markdown(CITATION_HTML, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 col3, col4 = st.columns(2)
@@ -205,6 +211,7 @@ with col3:
     layout_scatter['xaxis'] = dict(showgrid=True, gridcolor='#e0e0e0', title_font=dict(size=14, color='#333333'), tickfont=dict(color='#1a1a1a'))
     fig4.update_layout(**layout_scatter)
     st.plotly_chart(fig4, use_container_width=True, config=config, theme=None)
+    st.markdown(CITATION_HTML, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Chart 6: Global Share Pie Chart ---
@@ -214,9 +221,10 @@ with col4:
     target_share = latest_data['Share of Global CO2 (%)'] if 'Share of Global CO2 (%)' in latest_data else 0
     pie_data = pd.DataFrame({'Category': [target_country, 'Rest of the World'], 'Share (%)': [target_share, max(0, 100 - target_share)]})
     fig6 = px.pie(pie_data, names='Category', values='Share (%)', hole=0.5, color='Category', color_discrete_map={target_country: C_MAIN, 'Rest of the World': '#9e9e9e'})
-    fig6.update_layout(height=450, paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)', margin=dict(l=20, r=20, t=40, b=20), font=dict(color='#1a1a1a'))
+    fig6.update_layout(height=550, paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)', margin=dict(l=20, r=20, t=40, b=20), font=dict(color='#1a1a1a'))
     fig6.update_traces(textposition='inside', textinfo='percent+label')
     st.plotly_chart(fig6, use_container_width=True, config=config, theme=None)
+    st.markdown(CITATION_HTML, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Chart 5: Stacked Bar by Source ---
@@ -229,11 +237,11 @@ df_sources = df_target[['Year'] + sources].melt(id_vars='Year', var_name='Source
 fig5 = px.bar(df_sources, x='Year', y='Emissions', color='Source', color_discrete_sequence=source_colors)
 fig5.update_layout(**layout_template, barmode='stack', yaxis_title="CO₂ Emissions (Mt)")
 st.plotly_chart(fig5, use_container_width=True, config=config, theme=None)
+st.markdown(CITATION_HTML, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Download Data Option ---
 st.markdown("<div style='text-align: center; margin-top: 20px;'>", unsafe_allow_html=True)
 csv = df_filtered.to_csv(index=False).encode('utf-8')
 st.download_button(label="📥 Download Dataset (CSV)", data=csv, file_name='TISS_CO2_Data.csv', mime='text/csv')
-st.caption("Data: Our World in Data (OWID) — Global Carbon Project. Rendered for academic analysis.")
 st.markdown("</div>", unsafe_allow_html=True)

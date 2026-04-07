@@ -77,7 +77,7 @@ st.markdown("""
         border-color: #cccccc !important;
     }
 
-    /* HIDE |||*/
+    /* HIDE KEYBOARD_DOUBLE TOOLTIP */
     [data-testid="collapsedControl"] {
         pointer-events: none; /* Disable the glitchy hover completely */
     }
@@ -230,7 +230,7 @@ fig4 = px.scatter(df_scatter, x='GDP per Capita (Constant US$)', y='Total CO2 Em
                   color='Country', hover_name='Country', size='Population', size_max=60,
                   log_x=True, log_y=True, opacity=0.9, color_discrete_map={target_country: C_MAIN})
 
-# Removed tickmode='auto' and nticks to prevent Plotly from messing up the log scales
+# FIXED: Removed 'tickmode' and 'nticks' from both axes
 fig4.update_layout(
     **layout_template,
     xaxis_title="GDP per Capita (Constant US$) - Log Scale",

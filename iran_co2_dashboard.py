@@ -4,27 +4,21 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-# --- 1. Page Configuration ---
-st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide")
+# --- 1. Page Configuration (Locked Sidebar Open) ---
+st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide", initial_sidebar_state="expanded")
 
-# --- 2. Custom UI (Shiny App Structure + Original Colors + RIGHT SIDEBAR) ---
+# --- 2. Custom UI (Shiny App Structure + Original Colors + LEFT SIDEBAR + NO HIDE) ---
 st.markdown("""
     <style>
-    /* --- NEW: Move Sidebar to the Right --- */
-    [data-testid="stAppViewContainer"] {
-        flex-direction: row-reverse;
-    }
-
     /* Force Main Background to a shade of Green */
     .stApp {
         background-color: #e8f5e9 !important; 
     }
     
-    /* Force Sidebar (Panel) to a shade of Red, Border on LEFT now */
+    /* Force Sidebar (Panel) to a shade of Red, Border on RIGHT */
     [data-testid="stSidebar"] {
         background-color: #ffebee !important; 
-        border-right: none !important; 
-        border-left: 1px solid #e5cacc !important;
+        border-right: 1px solid #e5cacc !important;
     }
     
     /* Force all text to be dark */
@@ -109,10 +103,10 @@ st.markdown("""
         font-weight: 600;
     }
 
-    /* HIDE KEYBOARD_DOUBLE TOOLTIP */
-    [data-testid="collapsedControl"] { pointer-events: none; }
-    [data-testid="collapsedControl"] svg { pointer-events: auto; }
-    div[data-testid="stTooltipContent"], .stTooltipIcon { display: none !important; }
+    /* --- REMOVE SIDEBAR HIDE FUNCTION COMPLETELY --- */
+    [data-testid="collapsedControl"] { 
+        display: none !important; 
+    }
     
     hr { border-color: #e5cacc !important; }
     </style>
@@ -236,7 +230,7 @@ elif menu == "⚖️ Peer Comparison":
 
 
 elif menu == "💰 Economic Growth":
-    # Chart 4 - REMADE WITH FIXED TICK VALS
+    # Chart 4
     st.markdown('<div class="chart-container"><h3 style="color: #1b5e20;">💰 4. Economic Growth vs Carbon Output</h3>', unsafe_allow_html=True)
     df_scatter = df_filtered[df_filtered['Country'].isin(compare_full_list)]
     

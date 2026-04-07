@@ -7,18 +7,24 @@ import numpy as np
 # --- 1. Page Configuration ---
 st.set_page_config(page_title="Iran CO₂ Dashboard", page_icon="🌍", layout="wide")
 
-# --- 2. Custom UI (Shiny App Structure + Original Colors) ---
+# --- 2. Custom UI (Shiny App Structure + Original Colors + RIGHT SIDEBAR) ---
 st.markdown("""
     <style>
+    /* --- NEW: Move Sidebar to the Right --- */
+    [data-testid="stAppViewContainer"] {
+        flex-direction: row-reverse;
+    }
+
     /* Force Main Background to a shade of Green */
     .stApp {
         background-color: #e8f5e9 !important; 
     }
     
-    /* Force Sidebar (Panel) to a shade of Red */
+    /* Force Sidebar (Panel) to a shade of Red, Border on LEFT now */
     [data-testid="stSidebar"] {
         background-color: #ffebee !important; 
-        border-right: 1px solid #e5cacc !important;
+        border-right: none !important; 
+        border-left: 1px solid #e5cacc !important;
     }
     
     /* Force all text to be dark */
